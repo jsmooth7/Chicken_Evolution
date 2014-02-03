@@ -1,13 +1,22 @@
-function a = evolution
+%
+function fitness = evolution
+    % Check parameters.
     if (num_games ~= games_per_gene*number_of_genes)
         display('Error: Number of Games not equal to number of games encoded in genes.')
     end
+    
+    % Set first generation to have Always Swerve strategy.
     population = ones(population_size, num_games);
+    
+    % Set up some vectors to store data to plot later on.
     t=1:generations;
     average_fitness=[];
     average_swervyness=[];
+    
     for i=1:generations
         fitness=zeros(population_size,1);
+        % All the chickens play each other at the Game of Chicken, and
+        % their score is added to their too fitness.
         for j=1:population_size
             for k=1:j-1
                 score=chicken(population(j,:),population(k,:));
@@ -15,16 +24,25 @@ function a = evolution
                 fitness(k)=fitness(k)+score(2);
             end
         end
+        % Add some stats about our population
         average_fitness=[average_fitness,sum(fitness)/population_size];
         average_swervyness=[average_swervyness,sum(sum(population))/(population_size*num_games)];
+        % Sort the fitness of the chickens, with an index to keep track of
+        % which chicken has which fitness.
         ordered_fitness=sortrows([fitness,transpose(1:population_size)]);
+        % The best chickens get added to a list that will be used to make
+        % the next generation of chickens.
         breeders = [];
         for j=1:breeding_size
             breeders=[breeders;population(ordered_fitness(j,2),:)];
         end
+        
+        %Now we just breed the chickens to get the next generation.
         population = next_generation(breeders);
     end
+    % Plot/Return whatever data we are interested in here.
     plot(t, average_swervyness)
+    fitness = average_fitness;
 end
 
 function score = chicken(player1, player2)
@@ -52,12 +70,19 @@ end
 function population = next_generation(breeders)
    population = [];
    for i = 1:population_size
+       % Select a random chicken for the first parent.
        parent1 = randi(10);
+       % If the first parent is the best chicken, we select another chicken
+       % at random to be parent 2. 
+       % If not, we select another chicken that scored better to be parent
+       % 2. This way, the higher scoring chicken are more likely to breed
+       % more often.
        if (parent1 == 1)
            parent2 = randi(9)+1;
        else
            parent2 = randi(parent1 - 1);
        end
+       % Breed the two chickens, and add the child to the new population.
        population = [population; make_child(breeders(parent1,:),breeders(parent2,:))];
    end
 end
@@ -65,7 +90,10 @@ end
 function child = make_child(parent1, parent2)
     child = [];
     for i = 1:number_of_genes
+        % Pick which parent the child will inherit this gene from.
         gene_selection = randi(2);
+        % If is_mutated is small enough, the gene will be mutated, and
+        % will be completely random.
         is_mutated = rand;
         gene=[];
         if (gene_selection == 1)
@@ -80,20 +108,14 @@ function child = make_child(parent1, parent2)
     end
 end
 
+% Some adjustable parameters are below
+
 function n = num_games
     n=10;
 end
 
 function m = mutation_rate
     m=0.05;
-end
-
-function s = swerve
-    s = 1;
-end
-
-function d = drive
-    d = 0;
 end
 
 function p = population_size
@@ -108,11 +130,21 @@ function g = games_per_gene
     g = 2;
 end
 
-function n = number_of_genes;
-    n = 5
+function n = number_of_genes
+    n = 5;
 end
 
 function g = generations
     g = 200;
 end
 
+%Don't change swerve and drive. They are just to make the code slightly
+%more readable.
+
+function s = swerve
+    s = 1;
+end
+
+function d = drive
+    d = 0;
+end
