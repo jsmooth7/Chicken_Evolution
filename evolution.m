@@ -1,4 +1,3 @@
-%
 function fitness = evolution
     % Check parameters.
     if (num_games ~= games_per_gene*number_of_genes)
@@ -41,8 +40,11 @@ function fitness = evolution
         population = next_generation(breeders);
     end
     % Plot/Return whatever data we are interested in here.
-    plot(t, average_swervyness)
-    fitness = average_fitness;
+    plot(t, average_swervyness*100)
+    xlabel('Generation')
+    ylabel('Percent Swerves')
+    title('Simulated Evolution of Chickens that Play Chicken.')
+    fitness = average_fitness/(num_games*(population_size-1));
 end
 
 function score = chicken(player1, player2)
