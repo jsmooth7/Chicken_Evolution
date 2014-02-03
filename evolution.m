@@ -5,15 +5,17 @@ function fitness = evolution
     end
     
     % Set first generation to have Always Swerve strategy.
-    population = ones(population_size, num_games);
+    population = randi(2,population_size, num_games)-1;
     
     % Set up some vectors to store data to plot later on.
     t=1:generations;
     average_fitness=[];
     average_swervyness=[];
+    peak_fitness=[];
+    peak_swervyness=[];
     
     for i=1:generations
-        fitness=zeros(population_size,1);
+        fitness= zeros(population_size,1);
         % All the chickens play each other at the Game of Chicken, and
         % their score is added to their too fitness.
         for j=1:population_size
@@ -28,7 +30,9 @@ function fitness = evolution
         average_swervyness=[average_swervyness,sum(sum(population))/(population_size*num_games)];
         % Sort the fitness of the chickens, with an index to keep track of
         % which chicken has which fitness.
-        ordered_fitness=sortrows([fitness,transpose(1:population_size)]);
+        ordered_fitness=-sortrows(-[fitness,transpose(1:population_size)]);
+        peak_fitness=[peak_fitness,ordered_fitness(1,1)];
+        peak_swervyness=[peak_swervyness,sum(population(ordered_fitness(j,2),:))/num_games];
         % The best chickens get added to a list that will be used to make
         % the next generation of chickens.
         breeders = [];
@@ -44,7 +48,7 @@ function fitness = evolution
     xlabel('Generation')
     ylabel('Percent Swerves')
     title('Simulated Evolution of Chickens that Play Chicken.')
-    fitness = average_fitness/(num_games*(population_size-1));
+    fitness = peak_fitness/(num_games*(population_size-1));
 end
 
 function score = chicken(player1, player2)
@@ -73,14 +77,14 @@ function population = next_generation(breeders)
    population = [];
    for i = 1:population_size
        % Select a random chicken for the first parent.
-       parent1 = randi(10);
+       parent1 = randi(breeding_size);
        % If the first parent is the best chicken, we select another chicken
        % at random to be parent 2. 
        % If not, we select another chicken that scored better to be parent
        % 2. This way, the higher scoring chicken are more likely to breed
        % more often.
        if (parent1 == 1)
-           parent2 = randi(9)+1;
+           parent2 = randi(breeding_size-1)+1;
        else
            parent2 = randi(parent1 - 1);
        end
@@ -113,23 +117,23 @@ end
 % Some adjustable parameters are below
 
 function n = num_games
-    n=10;
+    n=50;
 end
 
 function m = mutation_rate
-    m=0.05;
+    m=0.02;
 end
 
 function p = population_size
-    p = 20;
+    p = 40;
 end
 
 function b = breeding_size
-    b = 10;
+    b = 20;
 end
 
 function g = games_per_gene
-    g = 2;
+    g = 10;
 end
 
 function n = number_of_genes
