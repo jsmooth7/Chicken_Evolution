@@ -4,7 +4,7 @@ function fitness = evolution
         display('Error: Number of Games not equal to number of games encoded in genes.')
     end
     
-    % Set first generation to have Always Swerve strategy.
+    % You can set the population to have a random state, an Always Drive state or an Always Swerve state.
     population = randi(2,population_size, num_games)-1;
     
     % Set up some vectors to store data to plot later on.
@@ -40,7 +40,7 @@ function fitness = evolution
             breeders=[breeders;population(ordered_fitness(j,2),:)];
         end
         
-        %Now we just breed the chickens to get the next generation.
+        % Now we just breed the chickens to get the next generation.
         population = next_generation(breeders);
     end
     % Plot/Return whatever data we are interested in here.
@@ -125,27 +125,27 @@ function m = mutation_rate
 end
 
 function p = population_size
-    p = 40;
+    p = 200;
 end
 
 function b = breeding_size
-    b = 20;
+    b = 10;
 end
 
 function g = games_per_gene
-    g = 10;
+    g = 5;
 end
 
 function n = number_of_genes
-    n = 5;
+    n = 10;
 end
 
 function g = generations
-    g = 200;
+    g = 20;
 end
 
-%Don't change swerve and drive. They are just to make the code slightly
-%more readable.
+% Don't change swerve and drive. They are just to make the code slightly
+% more readable.
 
 function s = swerve
     s = 1;
